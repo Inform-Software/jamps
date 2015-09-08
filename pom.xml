@@ -275,6 +275,13 @@
         <version>4.0</version>
       </dependency>
 
+      <!-- Solver libraries -->
+      <dependency>
+        <groupId>com.gurobi.solver</groupId>
+        <artifactId>gurobi</artifactId>
+        <version>[6.0.0,7.0.0)</version>
+      </dependency>
+
       <!-- Test Dependencies -->
       <dependency>
         <groupId>junit</groupId>

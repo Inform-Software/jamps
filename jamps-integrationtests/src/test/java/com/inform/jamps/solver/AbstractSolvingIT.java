@@ -275,4 +275,13 @@ public class AbstractSolvingIT {
     assertEquals ("Expecting different objective value", 26, bestSolution.getObjectiveValue (), 0.0001);
     assertEquals ("Expecting different objective gap", 0.0, bestSolution.getRelativeOptimalityGap (), 0.0001);
   }
+
+  protected static boolean isClassAvailable (String fqn) {
+    try {
+      Class.forName (fqn);
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
 }

@@ -18,6 +18,8 @@ package com.inform.jamps.solver.gurobi;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.inform.jamps.modeling.Program;
@@ -25,13 +27,17 @@ import com.inform.jamps.solver.AbstractSolvingIT;
 import com.inform.jamps.solver.ExecutionResult;
 import com.inform.jamps.solver.MathProgrammingSolver;
 import com.inform.jamps.solver.SolverParameters;
-import com.inform.jamps.solver.gurobi.GurobiSolverFactory;
 
 public class GurobiSolvingIT extends AbstractSolvingIT {
 
   private final GurobiSolverFactory factory    = new GurobiSolverFactory ();
 
   private final SolverParameters    parameters = factory.createParameters ();
+
+  @BeforeClass
+  public static void checkForGurobiLib () {
+    Assume.assumeTrue (isClassAvailable ("gurobi.GRB"));
+  }
 
   @Test
   public void solveKnapsack () {
