@@ -2,5 +2,7 @@
 /**/.classpath
 /**/.settings
 /**/.pmd
+/**/.pmdruleset.xml
 /**/target
+
 
