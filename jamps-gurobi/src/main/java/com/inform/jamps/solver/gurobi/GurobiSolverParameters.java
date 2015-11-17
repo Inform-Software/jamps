@@ -20,6 +20,20 @@ import gurobi.GRBException;
 
 public class GurobiSolverParameters implements SolverParameters {
 
+  private boolean writeLPFile;
+
+  private boolean writeMPSFile;
+
+  private boolean useNamesForModelFileOutput = true;
+
+  private boolean writeIISFile;
+
+  private boolean writeSolutionFile;
+
+  private boolean writeParameterFile;
+
+  private boolean useCompressionForFileOuput;
+
   protected GurobiSolverParameters () {
     super ();
   }
@@ -31,4 +45,61 @@ public class GurobiSolverParameters implements SolverParameters {
       throw new IllegalStateException ("Unable to create native environment", e);
     }
   }
+
+  public boolean isWriteLPFile () {
+    return writeLPFile;
+  }
+
+  public void setWriteLPFile (boolean writeLPFile) {
+    this.writeLPFile = writeLPFile;
+  }
+
+  public boolean isWriteMPSFile () {
+    return writeMPSFile;
+  }
+
+  public void setWriteMPSFile (boolean writeMPSFile) {
+    this.writeMPSFile = writeMPSFile;
+  }
+
+  public boolean isUseNamesForModelFileOutput () {
+    return useNamesForModelFileOutput;
+  }
+
+  public void setUseNamesForModelFileOutput (boolean useNamesForModelFileOutput) {
+    this.useNamesForModelFileOutput = useNamesForModelFileOutput;
+  }
+
+  public boolean isWriteIISFile () {
+    return writeIISFile;
+  }
+
+  public void setWriteIISFile (boolean writeIISFile) {
+    this.writeIISFile = writeIISFile;
+  }
+
+  public boolean isWriteSolutionFile () {
+    return writeSolutionFile;
+  }
+
+  public void setWriteSolutionFile (boolean writeSolutionFile) {
+    this.writeSolutionFile = writeSolutionFile;
+  }
+
+  public boolean isWriteParameterFile () {
+    return writeParameterFile;
+  }
+
+  public void setWriteParameterFile (boolean writeParameterFile) {
+    this.writeParameterFile = writeParameterFile;
+  }
+
+  public boolean isUseCompressionForFileOuput () {
+    return useCompressionForFileOuput;
+  }
+
+  public void setUseCompressionForFileOuput (boolean useCompressionForFileOuput) {
+    this.useCompressionForFileOuput = useCompressionForFileOuput;
+  }
+
 }

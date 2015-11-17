@@ -51,7 +51,6 @@ public class GurobiSolverTest {
     final GurobiProgram p = createProgram (nativeModel);
 
     final GurobiSolver solver = new GurobiSolver ();
-    solver.solve (p);
     solver.solve (new GurobiSolverParameters (), p);
 
     verify (nativeModel, times (2)).optimize ();
@@ -67,7 +66,7 @@ public class GurobiSolverTest {
     final GurobiSolver solver = new GurobiSolver ();
 
     try {
-      solver.solve (p);
+      solver.solve (new GurobiSolverParameters (), p);
       fail ("Expected SolverException");
     } catch (SolverException e) {
     }
@@ -80,12 +79,6 @@ public class GurobiSolverTest {
     final SolverParameters parameters = new GurobiSolverParameters ();
 
     final GurobiSolver solver = new GurobiSolver ();
-
-    try {
-      solver.solve (null);
-      fail ("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException e) {
-    }
 
     try {
       solver.solve (null, p);

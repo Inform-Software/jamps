@@ -29,11 +29,6 @@ public class GurobiSolver implements MathProgrammingSolver {
   }
 
   @Override
-  public GurobiExecutionResult solve (final Program program) {
-    return solve (new GurobiSolverParameters (), program);
-  }
-
-  @Override
   public GurobiExecutionResult solve (final SolverParameters parameters,
                                       final Program program) {
     if (parameters == null) {
@@ -63,7 +58,95 @@ public class GurobiSolver implements MathProgrammingSolver {
     } catch (GRBException e) {
       throw new SolverException ("Unable to solve program", e);
     }
+    GurobiExecutionResult executionResult = new GurobiExecutionResult (program);
 
-    return new GurobiExecutionResult (program);
+    writeOutputFiles (parameters, program, executionResult);
+
+    return executionResult;
+  }
+
+  protected void writeOutputFiles (final GurobiSolverParameters parameters,
+                                   final GurobiProgram program,
+                                   final GurobiExecutionResult executionResult) {
+    final String filename = program.getName ().replaceAll ("[^A-Za-z0-9_]", "_");
+    final GRBModel model = program.getNativeModel ();
+
+    if (parameters.isWriteLPFile ()) {
+      String suffix = ".lp";
+
+      if (!parameters.isUseNamesForModelFileOutput ()) {
+        suffix = ".rlp";
+      }
+
+      if (parameters.isUseCompressionForFileOuput ()) {
+        suffix += ".gz";
+      }
+
+      try {
+        model.write (filename + suffix);
+      } catch (GRBException e) {
+        throw new SolverException ("Unable to write LP file", e);
+      }
+    }
+
+    if (parameters.isWriteMPSFile ()) {
+      String suffix = ".mps";
+
+      if (!parameters.isUseNamesForModelFileOutput ()) {
+        suffix = ".rew";
+      }
+
+      if (parameters.isUseCompressionForFileOuput ()) {
+        suffix += ".gz";
+      }
+
+      try {
+        model.write (filename + suffix);
+      } catch (GRBException e) {
+        throw new SolverException ("Unable to write MPS file", e);
+      }
+    }
+
+    if (parameters.isWriteIISFile () && executionResult.isProblemInfeasible ()) {
+      String suffix = ".ilp";
+
+      if (parameters.isUseCompressionForFileOuput ()) {
+        suffix += ".gz";
+      }
+
+      try {
+        model.write (filename + suffix);
+      } catch (GRBException e) {
+        throw new SolverException ("Unable to write IIS to file", e);
+      }
+    }
+
+    if (parameters.isWriteParameterFile ()) {
+      String suffix = ".prm";
+
+      if (parameters.isUseCompressionForFileOuput ()) {
+        suffix += ".gz";
+      }
+
+      try {
+        model.write (filename + suffix);
+      } catch (GRBException e) {
+        throw new SolverException ("Unable to write parameter file", e);
+      }
+    }
+
+    if (parameters.isWriteSolutionFile () && executionResult.hasSolution ()) {
+      String suffix = ".sol";
+
+      if (parameters.isUseCompressionForFileOuput ()) {
+        suffix += ".gz";
+      }
+
+      try {
+        model.write (filename + suffix);
+      } catch (GRBException e) {
+        throw new SolverException ("Unable to write solution file", e);
+      }
+    }
   }
 }
