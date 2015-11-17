@@ -1,17 +1,14 @@
 /*
  * Copyright (C) 2015 The Jamps Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.inform.jamps.solver.gurobi;
@@ -37,9 +34,9 @@ public class GurobiSolution implements Solution {
 
   private final Map<Objective, Double>      objectiveValuesCache = new ConcurrentHashMap<Objective, Double> ();
 
-  private Double                            objectiveValue       = null;
+  private Double                            objectiveValue;
 
-  private Double                            bound                = null;
+  private Double                            bound;
 
   private double                            gap                  = Double.POSITIVE_INFINITY;
 
@@ -93,7 +90,7 @@ public class GurobiSolution implements Solution {
       double sum = 0.0;
 
       final List<GurobiObjective> objectives = program.getObjectives ();
-      for (GurobiObjective objective: objectives) {
+      for (final GurobiObjective objective: objectives) {
         if (objective.getObjectiveSense () == programSense) {
           sum += getObjectiveValue (objective);
         } else {
@@ -121,7 +118,7 @@ public class GurobiSolution implements Solution {
 
     final List<LinearTerm> linearTerms = objective.getExpression ().getLinearTerms ();
     double objectiveValue = objective.getExpression ().getConstant ();
-    for (LinearTerm term: linearTerms) {
+    for (final LinearTerm term: linearTerms) {
       objectiveValue += term.getCoefficient () * getVariableValue (term.getVariable ());
     }
 

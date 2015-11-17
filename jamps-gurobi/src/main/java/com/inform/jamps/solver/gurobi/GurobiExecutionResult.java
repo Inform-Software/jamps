@@ -1,28 +1,17 @@
 /*
  * Copyright (C) 2015 The Jamps Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.inform.jamps.solver.gurobi;
-
-import gurobi.GRB.DoubleAttr;
-import gurobi.GRB.IntAttr;
-import gurobi.GRB.IntParam;
-import gurobi.GRB.Status;
-import gurobi.GRBException;
-import gurobi.GRBModel;
-import gurobi.GRBVar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,21 +23,31 @@ import com.inform.jamps.solver.ExecutionResult;
 import com.inform.jamps.solver.Solution;
 import com.inform.jamps.solver.TerminationReason;
 
+import gurobi.GRB.DoubleAttr;
+import gurobi.GRB.IntAttr;
+import gurobi.GRB.IntParam;
+import gurobi.GRB.Status;
+import gurobi.GRBException;
+import gurobi.GRBModel;
+import gurobi.GRBVar;
+
 public class GurobiExecutionResult implements ExecutionResult<Program> {
 
-  private final static int           MILLIS_PER_SECOND = 1000;
+  private final static int           MILLIS_PER_SECOND          = 1000;
+
+  private final static double        DEFAULT_SOLUTION_VAR_VALUE = 0.0;
 
   private final GurobiProgram        program;
 
-  private final List<GurobiSolution> solutions         = new ArrayList<GurobiSolution> ();
+  private final List<GurobiSolution> solutions                  = new ArrayList<GurobiSolution> ();
 
-  private boolean                    infeasible        = false;
+  private boolean                    infeasible;
 
-  private boolean                    unbounded         = false;
+  private boolean                    unbounded;
 
-  private TerminationReason          terminationReason = TerminationReason.NONE;
+  private TerminationReason          terminationReason          = TerminationReason.NONE;
 
-  private long                       executionTime     = 0;
+  private long                       executionTime;
 
   protected GurobiExecutionResult (final GurobiProgram program) {
     if (program == null) {
@@ -82,7 +81,7 @@ public class GurobiExecutionResult implements ExecutionResult<Program> {
 
   @Override
   public boolean hasExecutionTerminated () {
-    return (terminationReason != TerminationReason.NONE);
+    return terminationReason != TerminationReason.NONE;
   }
 
   @Override
@@ -206,12 +205,12 @@ public class GurobiExecutionResult implements ExecutionResult<Program> {
       final GurobiSolution solution = new GurobiSolution (program, i == 0 && isOptimal);
       solution.setBestObjectiveBound (bestBound);
 
-      for (GurobiVariable var: variables) {
+      for (final GurobiVariable var: variables) {
         final GRBVar nativeVariable = var.getNativeVariable ();
         final double value = (isMip ? nativeVariable.get (DoubleAttr.Xn) : nativeVariable.get (DoubleAttr.X));
 
         // Storing value 0.0 is not necessary due to it is the default value
-        if (Math.abs (value) == 0.0) {
+        if (Math.abs (value) == DEFAULT_SOLUTION_VAR_VALUE) {
           continue;
         }
 

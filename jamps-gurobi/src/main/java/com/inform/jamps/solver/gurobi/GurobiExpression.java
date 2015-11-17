@@ -1,24 +1,17 @@
 /*
  * Copyright (C) 2015 The Jamps Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.inform.jamps.solver.gurobi;
-
-import gurobi.GRBException;
-import gurobi.GRBLinExpr;
-import gurobi.GRBVar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,15 +25,21 @@ import com.inform.jamps.modeling.LinearTerm;
 import com.inform.jamps.modeling.QuadraticTerm;
 import com.inform.jamps.modeling.Variable;
 
+import gurobi.GRBException;
+import gurobi.GRBLinExpr;
+import gurobi.GRBVar;
+
 public class GurobiExpression implements Expression {
+
+  private static final double                         ZERO_COEFFICIENT = 0.0;
 
   private final GurobiObjective                       objective;
 
   private final GurobiConstraint                      constraint;
 
-  private final Map<GurobiVariable, GurobiLinearTerm> linearTerms = new TreeMap<GurobiVariable, GurobiLinearTerm> ();
+  private final Map<GurobiVariable, GurobiLinearTerm> linearTerms      = new TreeMap<GurobiVariable, GurobiLinearTerm> ();
 
-  private double                                      constant    = 0.0;
+  private double                                      constant;
 
   protected GurobiExpression (final GurobiObjective objective) {
     if (objective == null) {
@@ -80,7 +79,7 @@ public class GurobiExpression implements Expression {
     final GurobiLinearTerm term = linearTerms.get (variable);
 
     if (term == null) {
-      return 0.0;
+      return ZERO_COEFFICIENT;
     } else {
       return term.getCoefficient ();
     }
@@ -89,13 +88,13 @@ public class GurobiExpression implements Expression {
   @Override
   public double getCoefficient (final Variable var1,
                                 final Variable var2) {
-    return 0.0;
+    return ZERO_COEFFICIENT;
   }
 
   @Override
   public Expression addTerm (final double coefficient,
                              final Variable variable) {
-    if (coefficient == 0.0) {
+    if (coefficient == ZERO_COEFFICIENT) {
       return this;
     }
 
@@ -125,7 +124,7 @@ public class GurobiExpression implements Expression {
 
   @Override
   public Expression addTerm (final double constant) {
-    if (constant == 0.0) {
+    if (constant == ZERO_COEFFICIENT) {
       return this;
     }
 
@@ -143,7 +142,7 @@ public class GurobiExpression implements Expression {
   @Override
   public Expression addTerms (final Expression expr) {
     final List<LinearTerm> linearTerms = expr.getLinearTerms ();
-    for (LinearTerm term: linearTerms) {
+    for (final LinearTerm term: linearTerms) {
       addTerm (term.getCoefficient (), term.getVariable ());
     }
 
@@ -166,7 +165,7 @@ public class GurobiExpression implements Expression {
 
   @Override
   public Expression removeConstant () {
-    this.constant = 0.0;
+    this.constant = ZERO_COEFFICIENT;
     return this;
   }
 
@@ -177,7 +176,7 @@ public class GurobiExpression implements Expression {
     final double[] coeffs = new double[linearTerms.size ()];
 
     int index = 0;
-    for (Entry<GurobiVariable, GurobiLinearTerm> entry: linearTerms.entrySet ()) {
+    for (final Entry<GurobiVariable, GurobiLinearTerm> entry: linearTerms.entrySet ()) {
       vars[index] = entry.getKey ().getNativeVariable ();
       coeffs[index] = entry.getValue ().getCoefficient ();
       index++;

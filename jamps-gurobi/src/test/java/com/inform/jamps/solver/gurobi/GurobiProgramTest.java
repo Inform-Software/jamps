@@ -1,17 +1,14 @@
 /*
  * Copyright (C) 2015 The Jamps Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.inform.jamps.solver.gurobi;
@@ -33,23 +30,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
-import gurobi.GRB;
-import gurobi.GRB.DoubleAttr;
-import gurobi.GRB.IntAttr;
-import gurobi.GRB.StringAttr;
-import gurobi.GRBConstr;
-import gurobi.GRBEnv;
-import gurobi.GRBException;
-import gurobi.GRBLinExpr;
-import gurobi.GRBModel;
-import gurobi.GRBVar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -65,7 +49,19 @@ import com.inform.jamps.modeling.ObjectiveSense;
 import com.inform.jamps.modeling.Operator;
 import com.inform.jamps.modeling.Variable;
 import com.inform.jamps.modeling.VariableType;
-import com.inform.jamps.solver.gurobi.GurobiProgram;
+
+import gurobi.GRB;
+import gurobi.GRB.DoubleAttr;
+import gurobi.GRB.IntAttr;
+import gurobi.GRB.StringAttr;
+import gurobi.GRBConstr;
+import gurobi.GRBEnv;
+import gurobi.GRBException;
+import gurobi.GRBLinExpr;
+import gurobi.GRBModel;
+import gurobi.GRBVar;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 @RunWith (PowerMockRunner.class)
 public class GurobiProgramTest {
@@ -203,7 +199,9 @@ public class GurobiProgramTest {
 
     assertEquals ("Expecting different name", name, c3.getName ());
 
-    assertThat ("Expecting different set of constraints", p.getConstraints (), Matchers.containsInAnyOrder (c1, c2, c3));
+    assertThat ("Expecting different set of constraints",
+                p.getConstraints (),
+                Matchers.containsInAnyOrder (c1, c2, c3));
   }
 
   @Test
@@ -234,10 +232,15 @@ public class GurobiProgramTest {
                             any (double[].class),
                             any (char[].class),
                             any (String[].class))).thenReturn (new GRBVar[] {mock (GRBVar.class), mock (GRBVar.class),
-        mock (GRBVar.class), mock (GRBVar.class), mock (GRBVar.class)});
+                                                                             mock (GRBVar.class), mock (GRBVar.class),
+                                                                             mock (GRBVar.class)});
 
-    when (grbModel.addConstrs (any (GRBLinExpr[].class), any (char[].class), any (double[].class), any (String[].class))).thenReturn (new GRBConstr[] {
-        mock (GRBConstr.class), mock (GRBConstr.class), mock (GRBConstr.class)});
+    when (grbModel.addConstrs (any (GRBLinExpr[].class),
+                               any (char[].class),
+                               any (double[].class),
+                               any (String[].class))).thenReturn (new GRBConstr[] {mock (GRBConstr.class),
+                                                                                   mock (GRBConstr.class),
+                                                                                   mock (GRBConstr.class)});
 
     final GurobiProgram p1 = createProgram (ObjectiveSense.MINIMIZE);
     final GurobiProgram p2 = createProgram (ObjectiveSense.MAXIMIZE);
@@ -281,11 +284,11 @@ public class GurobiProgramTest {
     }
 
     doReturn (new GRBVar[] {mock (GRBVar.class), mock (GRBVar.class), mock (GRBVar.class), mock (GRBVar.class),
-        mock (GRBVar.class)}).when (grbModel).addVars (any (double[].class),
-                                                       any (double[].class),
-                                                       any (double[].class),
-                                                       any (char[].class),
-                                                       any (String[].class));
+                            mock (GRBVar.class)}).when (grbModel).addVars (any (double[].class),
+                                                                           any (double[].class),
+                                                                           any (double[].class),
+                                                                           any (char[].class),
+                                                                           any (String[].class));
 
     doThrow (new GRBException ()).when (grbModel).addConstrs (any (GRBLinExpr[].class),
                                                               any (char[].class),
@@ -298,11 +301,12 @@ public class GurobiProgramTest {
     } catch (IllegalStateException e) {
     }
 
-    doReturn (new GRBConstr[] {mock (GRBConstr.class), mock (GRBConstr.class), mock (GRBConstr.class)}).when (grbModel)
-                                                                                                       .addConstrs (any (GRBLinExpr[].class),
-                                                                                                                    any (char[].class),
-                                                                                                                    any (double[].class),
-                                                                                                                    any (String[].class));
+    doReturn (new GRBConstr[] {mock (GRBConstr.class), mock (GRBConstr.class),
+                               mock (GRBConstr.class)}).when (grbModel)
+                                                       .addConstrs (any (GRBLinExpr[].class),
+                                                                    any (char[].class),
+                                                                    any (double[].class),
+                                                                    any (String[].class));
 
     doThrow (new GRBException ()).when (grbModel).set (any (DoubleAttr.class), anyDouble ());
     doThrow (new GRBException ()).when (grbModel).set (any (IntAttr.class), anyInt ());
@@ -376,8 +380,8 @@ public class GurobiProgramTest {
     when (UNKNOWN.name ()).thenReturn ("UNKNOWN");
 
     PowerMockito.mockStatic (Operator.class);
-    PowerMockito.when (Operator.values ()).thenReturn (new Operator[] {UNKNOWN, Operator.EQUALS,
-        Operator.GREATER_EQUALS, Operator.LESS_EQUALS});
+    PowerMockito.when (Operator.values ())
+                .thenReturn (new Operator[] {UNKNOWN, Operator.EQUALS, Operator.GREATER_EQUALS, Operator.LESS_EQUALS});
 
     final GRBEnv grbEnv = mock (GRBEnv.class);
     final GRBModel grbModel = mock (GRBModel.class);
@@ -388,7 +392,8 @@ public class GurobiProgramTest {
                             any (double[].class),
                             any (char[].class),
                             any (String[].class))).thenReturn (new GRBVar[] {mock (GRBVar.class), mock (GRBVar.class),
-        mock (GRBVar.class), mock (GRBVar.class), mock (GRBVar.class)});
+                                                                             mock (GRBVar.class), mock (GRBVar.class),
+                                                                             mock (GRBVar.class)});
 
     final GurobiProgram p = createProgram (ObjectiveSense.MINIMIZE);
     p.setNativeEnvironment (grbEnv);
@@ -463,12 +468,8 @@ public class GurobiProgramTest {
     c1.getRhs ().addTerm (20.0);
 
     final Constraint c3 = p.addConstraint (Operator.LESS_EQUALS);
-    c3.getLhs ()
-      .addTerm (7.0, var1)
-      .addTerm (11.0, var2)
-      .addTerm (12.0, var3)
-      .addTerm (13.0, var4)
-      .addTerm (14.0, var5);
+    c3.getLhs ().addTerm (7.0, var1).addTerm (11.0, var2).addTerm (12.0, var3).addTerm (13.0, var4).addTerm (14.0,
+                                                                                                             var5);
     c1.getRhs ().addTerm (30.0);
     return p;
   }
