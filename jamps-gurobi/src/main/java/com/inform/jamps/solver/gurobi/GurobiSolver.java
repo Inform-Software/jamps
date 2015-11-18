@@ -115,6 +115,7 @@ public class GurobiSolver implements MathProgrammingSolver {
       }
 
       try {
+        model.computeIIS ();
         model.write (filename + suffix);
       } catch (GRBException e) {
         throw new SolverException ("Unable to write IIS to file", e);
