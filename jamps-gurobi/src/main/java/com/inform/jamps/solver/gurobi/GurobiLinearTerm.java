@@ -86,9 +86,6 @@ public class GurobiLinearTerm implements LinearTerm {
     if (Double.doubleToLongBits (coefficient) != Double.doubleToLongBits (other.coefficient)) {
       return false;
     }
-    if (!variable.equals (other.variable)) {
-      return false;
-    }
-    return true;
+    return variable.equals (other.variable);
   }
 }

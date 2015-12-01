@@ -202,10 +202,7 @@ public class GurobiSolution implements Solution {
     } else if (!bound.equals (other.bound)) {
       return false;
     }
-    if (!variableValues.equals (other.variableValues)) {
-      return false;
-    }
-    return true;
+    return variableValues.equals (other.variableValues);
   }
 
 }

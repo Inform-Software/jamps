@@ -240,10 +240,7 @@ public class GurobiExpression implements Expression {
     if (Double.doubleToLongBits (constant) != Double.doubleToLongBits (other.constant)) {
       return false;
     }
-    if (!linearTerms.equals (other.linearTerms)) {
-      return false;
-    }
-    return true;
+    return linearTerms.equals (other.linearTerms);
   }
 
 }

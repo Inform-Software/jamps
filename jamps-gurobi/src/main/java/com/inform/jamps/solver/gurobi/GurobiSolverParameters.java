@@ -50,7 +50,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return writeLPFile;
   }
 
-  public void setWriteLPFile (boolean writeLPFile) {
+  public void setWriteLPFile (final boolean writeLPFile) {
     this.writeLPFile = writeLPFile;
   }
 
@@ -58,7 +58,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return writeMPSFile;
   }
 
-  public void setWriteMPSFile (boolean writeMPSFile) {
+  public void setWriteMPSFile (final boolean writeMPSFile) {
     this.writeMPSFile = writeMPSFile;
   }
 
@@ -66,7 +66,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return useNamesForModelFileOutput;
   }
 
-  public void setUseNamesForModelFileOutput (boolean useNamesForModelFileOutput) {
+  public void setUseNamesForModelFileOutput (final boolean useNamesForModelFileOutput) {
     this.useNamesForModelFileOutput = useNamesForModelFileOutput;
   }
 
@@ -74,7 +74,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return writeIISFile;
   }
 
-  public void setWriteIISFile (boolean writeIISFile) {
+  public void setWriteIISFile (final boolean writeIISFile) {
     this.writeIISFile = writeIISFile;
   }
 
@@ -82,7 +82,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return writeSolutionFile;
   }
 
-  public void setWriteSolutionFile (boolean writeSolutionFile) {
+  public void setWriteSolutionFile (final boolean writeSolutionFile) {
     this.writeSolutionFile = writeSolutionFile;
   }
 
@@ -90,7 +90,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return writeParameterFile;
   }
 
-  public void setWriteParameterFile (boolean writeParameterFile) {
+  public void setWriteParameterFile (final boolean writeParameterFile) {
     this.writeParameterFile = writeParameterFile;
   }
 
@@ -98,7 +98,7 @@ public class GurobiSolverParameters implements SolverParameters {
     return useCompressionForFileOuput;
   }
 
-  public void setUseCompressionForFileOuput (boolean useCompressionForFileOuput) {
+  public void setUseCompressionForFileOuput (final boolean useCompressionForFileOuput) {
     this.useCompressionForFileOuput = useCompressionForFileOuput;
   }
 

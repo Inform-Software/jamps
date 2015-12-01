@@ -137,10 +137,7 @@ public class GurobiObjective implements Objective {
     if (!name.equals (other.name)) {
       return false;
     }
-    if (!expression.equals (other.expression)) {
-      return false;
-    }
-    return true;
+    return expression.equals (other.expression);
   }
 
 }

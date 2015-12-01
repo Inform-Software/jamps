@@ -399,9 +399,6 @@ public class GurobiProgram implements Program {
     if (!objectives.equals (other.objectives)) {
       return false;
     }
-    if (!variables.equals (other.variables)) {
-      return false;
-    }
-    return true;
+    return variables.equals (other.variables);
   }
 }

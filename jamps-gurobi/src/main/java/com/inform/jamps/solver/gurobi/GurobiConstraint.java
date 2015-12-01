@@ -170,10 +170,7 @@ public class GurobiConstraint implements Constraint {
     if (!lhs.equals (other.lhs)) {
       return false;
     }
-    if (!rhs.equals (other.rhs)) {
-      return false;
-    }
-    return true;
+    return rhs.equals (other.rhs);
   }
 
 }
