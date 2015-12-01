@@ -19,6 +19,12 @@ public interface Program extends Comparable<Program> {
 
   void setName (String name);
 
+  int getVariablesCount ();
+
+  int getObjectivesCount ();
+
+  int getConstraintsCount ();
+
   Variable addVariable (String name,
                         VariableType variableType,
                         double lowerBound,

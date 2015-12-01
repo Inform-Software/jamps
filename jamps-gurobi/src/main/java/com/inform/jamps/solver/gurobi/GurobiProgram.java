@@ -82,6 +82,21 @@ public class GurobiProgram implements Program {
   }
 
   @Override
+  public int getVariablesCount () {
+    return variables.size ();
+  }
+
+  @Override
+  public int getObjectivesCount () {
+    return objectives.size ();
+  }
+
+  @Override
+  public int getConstraintsCount () {
+    return constraints.size ();
+  }
+
+  @Override
   public Variable addVariable (final String name,
                                final VariableType variableType,
                                final double lowerBound,
@@ -401,4 +416,5 @@ public class GurobiProgram implements Program {
     }
     return variables.equals (other.variables);
   }
+
 }
