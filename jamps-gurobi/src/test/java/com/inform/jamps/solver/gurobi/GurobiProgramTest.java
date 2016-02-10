@@ -13,23 +13,9 @@
 
 package com.inform.jamps.solver.gurobi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,6 +106,7 @@ public class GurobiProgramTest {
     final Variable var4 = p.addVariable (type, lb, ub);
     final Variable var5 = p.addVariable (varName, type, lb, ub);
 
+    assertEquals ("Expecting different amount of variables", 5, p.getVariablesCount ());
     assertNotNull ("Expecting variable", var1);
     assertNotNull ("Expecting variable", var2);
     assertNotNull ("Expecting variable", var3);
@@ -166,6 +153,7 @@ public class GurobiProgramTest {
     final Objective obj2 = p.addObjective (sense);
     final Objective obj3 = p.addObjective (name, sense);
 
+    assertEquals ("Expecting different amount of objectives", 3, p.getObjectivesCount ());
     assertNotNull ("Expecting objective", obj1);
     assertNotNull ("Expecting objective", obj2);
     assertNotNull ("Expecting objective", obj3);
@@ -190,6 +178,7 @@ public class GurobiProgramTest {
     final Constraint c2 = p.addConstraint (op);
     final Constraint c3 = p.addConstraint (name, op);
 
+    assertEquals ("Expecting different amount of constraints", 3, p.getConstraintsCount ());
     assertNotNull ("Expecting constraint", c1);
     assertNotNull ("Expecting constraint", c2);
     assertNotNull ("Expecting constraint", c3);
@@ -225,7 +214,7 @@ public class GurobiProgramTest {
   public void testCreationOfNativeModel () throws Exception {
     final GRBEnv grbEnv = mock (GRBEnv.class);
     final GRBModel grbModel = mock (GRBModel.class);
-    whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
+    PowerMockito.whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
 
     when (grbModel.addVars (any (double[].class),
                             any (double[].class),
@@ -266,7 +255,7 @@ public class GurobiProgramTest {
   public void testCreationOfNativeModelWithGurobiErrors () throws Exception {
     final GRBEnv grbEnv = mock (GRBEnv.class);
     final GRBModel grbModel = mock (GRBModel.class);
-    whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
+    PowerMockito.whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
 
     doThrow (new GRBException ()).when (grbModel).addVars (any (double[].class),
                                                            any (double[].class),
@@ -302,11 +291,10 @@ public class GurobiProgramTest {
     }
 
     doReturn (new GRBConstr[] {mock (GRBConstr.class), mock (GRBConstr.class),
-                               mock (GRBConstr.class)}).when (grbModel)
-                                                       .addConstrs (any (GRBLinExpr[].class),
-                                                                    any (char[].class),
-                                                                    any (double[].class),
-                                                                    any (String[].class));
+                               mock (GRBConstr.class)}).when (grbModel).addConstrs (any (GRBLinExpr[].class),
+                                                                                    any (char[].class),
+                                                                                    any (double[].class),
+                                                                                    any (String[].class));
 
     doThrow (new GRBException ()).when (grbModel).set (any (DoubleAttr.class), anyDouble ());
     doThrow (new GRBException ()).when (grbModel).set (any (IntAttr.class), anyInt ());
@@ -359,7 +347,7 @@ public class GurobiProgramTest {
 
     final GRBEnv grbEnv = mock (GRBEnv.class);
     final GRBModel grbModel = mock (GRBModel.class);
-    whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
+    PowerMockito.whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
 
     final GurobiProgram p = createProgram (ObjectiveSense.MINIMIZE);
     p.setNativeEnvironment (grbEnv);
@@ -385,7 +373,7 @@ public class GurobiProgramTest {
 
     final GRBEnv grbEnv = mock (GRBEnv.class);
     final GRBModel grbModel = mock (GRBModel.class);
-    whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
+    PowerMockito.whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
 
     when (grbModel.addVars (any (double[].class),
                             any (double[].class),

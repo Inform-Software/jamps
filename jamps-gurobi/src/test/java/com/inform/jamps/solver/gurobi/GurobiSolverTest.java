@@ -13,17 +13,13 @@
 
 package com.inform.jamps.solver.gurobi;
 
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -34,6 +30,8 @@ import com.inform.jamps.modeling.Program;
 import com.inform.jamps.modeling.Variable;
 import com.inform.jamps.solver.SolverParameters;
 
+import gurobi.GRB.IntAttr;
+import gurobi.GRB.Status;
 import gurobi.GRBConstr;
 import gurobi.GRBEnv;
 import gurobi.GRBException;
@@ -48,28 +46,12 @@ public class GurobiSolverTest {
   @Test
   public void testSolving () throws Exception {
     final GRBModel nativeModel = mock (GRBModel.class);
-    final GurobiProgram p = createProgram (nativeModel);
+    final Program p = createProgram (nativeModel);
 
     final GurobiSolver solver = new GurobiSolver ();
     solver.solve (new GurobiSolverParameters (), p);
 
-    verify (nativeModel, times (2)).optimize ();
-  }
-
-  @Test
-  public void testSolvingWithGurobiError () throws Exception {
-    final GRBModel nativeModel = mock (GRBModel.class);
-    doThrow (new GRBException ()).when (nativeModel).optimize ();
-
-    final GurobiProgram p = createProgram (nativeModel);
-
-    final GurobiSolver solver = new GurobiSolver ();
-
-    try {
-      solver.solve (new GurobiSolverParameters (), p);
-      fail ("Expected SolverException");
-    } catch (SolverException e) {
-    }
+    verify (nativeModel).optimize ();
   }
 
   @Test
@@ -105,9 +87,194 @@ public class GurobiSolverTest {
     }
   }
 
-  protected GurobiProgram createProgram (GRBModel grbModel) throws Exception {
+  @Test
+  public void testWritingOutputFiles () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    final Program p = createProgram (nativeModel);
+    p.setName ("test");
+
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteLPFile (true);
+    parameters.setWriteMPSFile (true);
+    parameters.setWriteParameterFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.lp");
+    verify (nativeModel).write ("test.mps");
+    verify (nativeModel).write ("test.prm");
+
+    parameters.setUseCompressionForFileOuput (true);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.lp.gz");
+    verify (nativeModel).write ("test.mps.gz");
+    verify (nativeModel).write ("test.prm.gz");
+  }
+
+  @Test
+  public void testWritingOutputFilesWithoutNames () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    final Program p = createProgram (nativeModel);
+    p.setName ("test");
+
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setUseNamesForModelFileOutput (false);
+    parameters.setWriteLPFile (true);
+    parameters.setWriteMPSFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.rlp");
+    verify (nativeModel).write ("test.rew");
+
+    parameters.setUseCompressionForFileOuput (true);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.rlp.gz");
+    verify (nativeModel).write ("test.rew.gz");
+  }
+
+  @Test
+  public void testWritingIISFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    final Program p = createProgram (nativeModel);
+    p.setName ("test");
+
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteIISFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+
+    verify (nativeModel, never ()).write ("test.ilp");
+
+    when (nativeModel.get (IntAttr.Status)).thenReturn (Status.INFEASIBLE);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.ilp");
+
+    parameters.setUseCompressionForFileOuput (true);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.ilp.gz");
+  }
+
+  @Test
+  public void testWritingSolutionFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    final Program p = createProgram (nativeModel);
+    p.setName ("test");
+
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteSolutionFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+
+    verify (nativeModel, never ()).write ("test.sol");
+
+    when (nativeModel.get (IntAttr.Status)).thenReturn (Status.OPTIMAL);
+    when (nativeModel.get (IntAttr.SolCount)).thenReturn (1);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.sol");
+
+    parameters.setUseCompressionForFileOuput (true);
+    solver.solve (parameters, p);
+
+    verify (nativeModel).write ("test.sol.gz");
+  }
+
+  @Test
+  public void testSolvingWithGurobiError () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    doThrow (new GRBException ()).when (nativeModel).optimize ();
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolver solver = new GurobiSolver ();
+
+    try {
+      solver.solve (new GurobiSolverParameters (), p);
+      fail ("Expected SolverException");
+    } catch (SolverException e) {
+    }
+  }
+
+  @Test (expected = SolverException.class)
+  public void testErrorWritingLPFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    doThrow (new GRBException ()).when (nativeModel).write (anyString ());
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteLPFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+  }
+
+  @Test (expected = SolverException.class)
+  public void testErrorWritingMPSFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    doThrow (new GRBException ()).when (nativeModel).write (anyString ());
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteMPSFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+  }
+
+  @Test (expected = SolverException.class)
+  public void testErrorWritingParameterFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    doThrow (new GRBException ()).when (nativeModel).write (anyString ());
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteParameterFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+  }
+
+  @Test (expected = SolverException.class)
+  public void testErrorWritingIISFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    when (nativeModel.get (IntAttr.Status)).thenReturn (Status.INFEASIBLE);
+    doThrow (new GRBException ()).when (nativeModel).write (anyString ());
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteIISFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+  }
+
+  @Test (expected = SolverException.class)
+  public void testErrorWritingSolutionFile () throws Exception {
+    final GRBModel nativeModel = mock (GRBModel.class);
+    when (nativeModel.get (IntAttr.Status)).thenReturn (Status.OPTIMAL);
+    when (nativeModel.get (IntAttr.SolCount)).thenReturn (1);
+    doThrow (new GRBException ()).when (nativeModel).write (anyString ());
+
+    final Program p = createProgram (nativeModel);
+    final GurobiSolverParameters parameters = new GurobiSolverParameters ();
+    parameters.setWriteSolutionFile (true);
+
+    final GurobiSolver solver = new GurobiSolver ();
+    solver.solve (parameters, p);
+  }
+
+  protected Program createProgram (GRBModel grbModel) throws Exception {
     final GRBEnv grbEnv = mock (GRBEnv.class);
-    whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
+    when (grbModel.getEnv ()).thenReturn (grbEnv);
+    PowerMockito.whenNew (GRBModel.class).withAnyArguments ().thenReturn (grbModel);
 
     when (grbModel.addVars (any (double[].class),
                             any (double[].class),
