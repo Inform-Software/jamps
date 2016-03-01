@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.commons.math3.util.Precision;
+
 import com.inform.jamps.modeling.Expression;
 import com.inform.jamps.modeling.LinearTerm;
 import com.inform.jamps.modeling.QuadraticTerm;
@@ -94,7 +96,7 @@ public class GurobiExpression implements Expression {
   @Override
   public Expression addTerm (final double coefficient,
                              final Variable variable) {
-    if (coefficient == ZERO_COEFFICIENT) {
+    if (Precision.equals (coefficient, ZERO_COEFFICIENT)) {
       return this;
     }
 
@@ -124,7 +126,7 @@ public class GurobiExpression implements Expression {
 
   @Override
   public Expression addTerm (final double constant) {
-    if (constant == ZERO_COEFFICIENT) {
+    if (Precision.equals (constant, ZERO_COEFFICIENT)) {
       return this;
     }
 
@@ -203,8 +205,9 @@ public class GurobiExpression implements Expression {
     }
 
     final GurobiExpression grbExpr = ((GurobiExpression) expr);
-    final int exprLength1 = linearTerms.size () + ((constant == 0.0) ? 0 : 1);
-    final int exprLength2 = grbExpr.linearTerms.size () + ((grbExpr.constant == 0.0) ? 0 : 1);
+    final int exprLength1 = linearTerms.size () + (Precision.equals (constant, ZERO_COEFFICIENT) ? 0 : 1);
+    final int exprLength2 = grbExpr.linearTerms.size () +
+                            (Precision.equals (grbExpr.constant, ZERO_COEFFICIENT) ? 0 : 1);
 
     final int result = Integer.valueOf (exprLength1).compareTo (exprLength2);
     if (result != 0) {

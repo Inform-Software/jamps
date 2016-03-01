@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.math3.util.Precision;
+
 import com.inform.jamps.modeling.ObjectiveSense;
 import com.inform.jamps.modeling.Program;
 import com.inform.jamps.solver.ExecutionResult;
@@ -210,7 +212,7 @@ public class GurobiExecutionResult implements ExecutionResult<Program> {
         final double value = (isMip ? nativeVariable.get (DoubleAttr.Xn) : nativeVariable.get (DoubleAttr.X));
 
         // Storing value 0.0 is not necessary due to it is the default value
-        if (Math.abs (value) == DEFAULT_SOLUTION_VAR_VALUE) {
+        if (Precision.equals (Math.abs (value), DEFAULT_SOLUTION_VAR_VALUE)) {
           continue;
         }
 
