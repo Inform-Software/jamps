@@ -196,9 +196,14 @@ public class GurobiSolverTest {
     final Program p = createProgram (nativeModel);
     final GurobiSolver solver = new GurobiSolver ();
 
+    final GurobiExecutionResult result = solver.solve (new GurobiSolverParameters (), p);
+    assertNotNull ("Gurobi should try to gather result even in case of an error", result);
+
+    doThrow (new GRBException ()).when (nativeModel).get (any (IntAttr.class));
+
     try {
       solver.solve (new GurobiSolverParameters (), p);
-      fail ("Expected SolverException");
+      fail ("Expected SolverException when eveluating execution result failed");
     } catch (SolverException e) {
     }
   }
