@@ -56,7 +56,12 @@ public class GurobiSolver implements MathProgrammingSolver {
     try {
       model.optimize ();
     } catch (GRBException e) {
-      throw new SolverException ("Unable to solve program", e);
+      try {
+        // Try to get an execution result, although we had an exception
+        return new GurobiExecutionResult (program);
+      } catch (Exception e2) {
+        throw new SolverException ("Unable to solve program", e);
+      }
     }
 
     final GurobiExecutionResult executionResult = new GurobiExecutionResult (program);
