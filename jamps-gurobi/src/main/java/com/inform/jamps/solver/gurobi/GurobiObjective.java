@@ -140,4 +140,8 @@ public class GurobiObjective implements Objective {
     return expression.equals (other.expression);
   }
 
+  @Override
+  public String toString () {
+    return name + ": " + expression.toString ();
+  }
 }

@@ -88,4 +88,9 @@ public class GurobiLinearTerm implements LinearTerm {
     }
     return variable.equals (other.variable);
   }
+
+  @Override
+  public String toString () {
+    return coefficient + " " + variable.toString ();
+  }
 }

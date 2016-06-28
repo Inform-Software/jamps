@@ -417,4 +417,8 @@ public class GurobiProgram implements Program {
     return variables.equals (other.variables);
   }
 
+  @Override
+  public String toString () {
+    return name;
+  }
 }

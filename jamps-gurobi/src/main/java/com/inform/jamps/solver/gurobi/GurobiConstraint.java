@@ -173,4 +173,24 @@ public class GurobiConstraint implements Constraint {
     return rhs.equals (other.rhs);
   }
 
+  @Override
+  public String toString () {
+    final StringBuilder sb = new StringBuilder (1000);
+    sb.append (name).append (": ").append (lhs);
+    switch (operator) {
+      case EQUALS:
+        sb.append (" = ");
+        break;
+      case GREATER_EQUALS:
+        sb.append (" >= ");
+        break;
+      case LESS_EQUALS:
+        sb.append (" <= ");
+        break;
+      default:
+        break;
+    }
+    sb.append (rhs);
+    return sb.toString ();
+  }
 }

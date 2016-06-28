@@ -15,6 +15,8 @@ package com.inform.jamps.solver.gurobi;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.math3.util.Precision;
+
 import com.inform.jamps.modeling.Variable;
 import com.inform.jamps.modeling.VariableType;
 
@@ -199,5 +201,49 @@ public class GurobiVariable implements Variable {
       return false;
     }
     return Double.doubleToLongBits (upperBound) == Double.doubleToLongBits (other.upperBound);
+  }
+
+  @Override
+  public String toString () {
+    final StringBuilder sb = new StringBuilder (200);
+    switch (type) {
+      case BINARY:
+        sb.append ("Binary ");
+        break;
+      case CONTINUOUS:
+        sb.append ("Continuous ");
+        break;
+      case INTEGER:
+        sb.append ("Integer ");
+        break;
+      case SEMI_CONTINUOUS:
+        sb.append ("Semi-Continuous ");
+        break;
+      case SEMI_INTEGER:
+        sb.append ("Semi-Integer ");
+        break;
+      default:
+        break;
+    }
+    sb.append (name);
+    if (lowerBound > Double.NEGATIVE_INFINITY || upperBound < Double.POSITIVE_INFINITY) {
+      if (Precision.equals (lowerBound, Double.NEGATIVE_INFINITY)) {
+        sb.append (" (,");
+      } else {
+        sb.append (" [");
+        sb.append (lowerBound);
+        sb.append (',');
+      }
+      if (Precision.equals (upperBound, Double.POSITIVE_INFINITY)) {
+        sb.append (')');
+      } else {
+        sb.append (' ');
+        sb.append (upperBound);
+        sb.append (']');
+      }
+    } else {
+      sb.append (" (unbounded)");
+    }
+    return sb.toString ();
   }
 }

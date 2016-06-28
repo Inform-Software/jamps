@@ -246,4 +246,39 @@ public class GurobiExpression implements Expression {
     return linearTerms.equals (other.linearTerms);
   }
 
+  @Override
+  public String toString () {
+    if (linearTerms.isEmpty ()) {
+      return String.valueOf (constant);
+    }
+
+    final StringBuilder sb = new StringBuilder (2000);
+    for (final Entry<GurobiVariable, GurobiLinearTerm> entry: linearTerms.entrySet ()) {
+      final GurobiLinearTerm term = entry.getValue ();
+      final double coefficient = term.getCoefficient ();
+      final double abs = Math.abs (coefficient);
+
+      if (sb.length () > 0 || coefficient < 0.0) {
+        sb.append (' ');
+        sb.append (coefficient < ZERO_COEFFICIENT ? '-' : '+');
+        sb.append (' ');
+      }
+
+      if (!Precision.equals (abs, 1.0)) {
+        sb.append (abs);
+        sb.append (' ');
+      }
+      sb.append (term.getVariable ().getName ());
+    }
+
+    if (constant < ZERO_COEFFICIENT) {
+      sb.append (" - ");
+      sb.append (Math.abs (constant));
+    } else if (constant > ZERO_COEFFICIENT) {
+      sb.append (" + ");
+      sb.append (constant);
+    }
+
+    return sb.toString ();
+  }
 }
