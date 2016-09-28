@@ -157,12 +157,12 @@ public class GurobiVariable implements Variable {
       return result;
     }
 
-    result = Double.valueOf (lowerBound).compareTo (var.getLowerBound ());
+    result = Double.compare (lowerBound, var.getLowerBound ());
     if (result != 0) {
       return result;
     }
 
-    return Double.valueOf (upperBound).compareTo (var.getUpperBound ());
+    return Double.compare (upperBound, var.getUpperBound ());
   }
 
   @Override

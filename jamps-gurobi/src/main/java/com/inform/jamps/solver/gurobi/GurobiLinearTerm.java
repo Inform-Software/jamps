@@ -57,7 +57,7 @@ public class GurobiLinearTerm implements LinearTerm {
       return result;
     }
 
-    return Double.valueOf (coefficient).compareTo (o.getCoefficient ());
+    return Double.compare (coefficient, o.getCoefficient ());
   }
 
   @Override

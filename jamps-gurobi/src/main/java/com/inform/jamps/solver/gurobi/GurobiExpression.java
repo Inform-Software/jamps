@@ -214,7 +214,7 @@ public class GurobiExpression implements Expression {
       return result;
     }
 
-    return Double.valueOf (constant).compareTo (grbExpr.constant);
+    return Double.compare (constant, grbExpr.constant);
   }
 
   @Override

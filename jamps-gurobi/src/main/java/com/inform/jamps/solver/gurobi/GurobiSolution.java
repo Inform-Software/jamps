@@ -167,7 +167,7 @@ public class GurobiSolution implements Solution {
       return -1;
     }
 
-    return Double.valueOf (getObjectiveValue ()).compareTo (o.getObjectiveValue ());
+    return Double.compare (getObjectiveValue (), o.getObjectiveValue ());
   }
 
   @Override
