@@ -13,12 +13,16 @@
 
 package com.inform.jamps.solver.gurobi;
 
+import java.io.File;
+
 import com.inform.jamps.solver.SolverParameters;
 
 import gurobi.GRBEnv;
 import gurobi.GRBException;
 
 public class GurobiSolverParameters implements SolverParameters {
+
+  private File    outputDirectory;
 
   private boolean writeLPFile;
 
@@ -44,6 +48,14 @@ public class GurobiSolverParameters implements SolverParameters {
     } catch (GRBException e) {
       throw new IllegalStateException ("Unable to create native environment", e);
     }
+  }
+
+  public File getOutputDirectory () {
+    return outputDirectory;
+  }
+
+  public void setOutputDirectory (final File outputDirectory) {
+    this.outputDirectory = outputDirectory;
   }
 
   public boolean isWriteLPFile () {
