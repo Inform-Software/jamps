@@ -18,7 +18,6 @@ import java.io.File;
 import com.inform.jamps.exception.SolverException;
 import com.inform.jamps.modeling.Program;
 import com.inform.jamps.solver.MathProgrammingSolver;
-import com.inform.jamps.solver.SolverParameters;
 
 import gurobi.GRBEnv;
 import gurobi.GRBException;
@@ -26,31 +25,25 @@ import gurobi.GRBModel;
 
 public class GurobiSolver implements MathProgrammingSolver {
 
-  protected GurobiSolver () {
-    super ();
+  private final GurobiSolverParameters parameters;
+
+  protected GurobiSolver (final GurobiSolverParameters parameters) {
+    this.parameters = parameters;
   }
 
   @Override
-  public GurobiExecutionResult solve (final SolverParameters parameters,
-                                      final Program program) {
-    if (parameters == null) {
-      throw new IllegalArgumentException ("Parameter SolverParameters is mandatory and may not be null");
-    }
+  public GurobiExecutionResult solve (final Program program) {
     if (program == null) {
       throw new IllegalArgumentException ("Parameter program is mandatory and may not be null");
-    }
-    if (!(parameters instanceof GurobiSolverParameters)) {
-      throw new IllegalArgumentException ("SolverParameters is not of type GurobiSolverParameters");
     }
     if (!(program instanceof GurobiProgram)) {
       throw new IllegalArgumentException ("Program is not of type GurobiProgram");
     }
 
-    return solve ((GurobiSolverParameters) parameters, (GurobiProgram) program);
+    return solve ((GurobiProgram) program);
   }
 
-  protected GurobiExecutionResult solve (final GurobiSolverParameters parameters,
-                                         final GurobiProgram program) {
+  protected GurobiExecutionResult solve (final GurobiProgram program) {
     final GRBEnv env = parameters.getNativeEnvironment ();
     program.setNativeEnvironment (env);
 

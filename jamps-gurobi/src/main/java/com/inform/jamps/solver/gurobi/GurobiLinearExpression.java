@@ -16,47 +16,25 @@ package com.inform.jamps.solver.gurobi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.commons.math3.util.Precision;
 
 import com.inform.jamps.modeling.Expression;
+import com.inform.jamps.modeling.LinearExpression;
 import com.inform.jamps.modeling.LinearTerm;
 import com.inform.jamps.modeling.QuadraticTerm;
 import com.inform.jamps.modeling.Variable;
 
-import gurobi.GRBException;
 import gurobi.GRBLinExpr;
-import gurobi.GRBVar;
 
-public class GurobiExpression implements Expression {
+public class GurobiLinearExpression implements LinearExpression {
 
-  private static final double                         ZERO_COEFFICIENT = 0.0;
+  private static final double ZERO_COEFFICIENT = 0.0;
 
-  private final GurobiObjective                       objective;
+  private final GRBLinExpr    expression;
 
-  private final GurobiConstraint                      constraint;
-
-  private final Map<GurobiVariable, GurobiLinearTerm> linearTerms      = new TreeMap<GurobiVariable, GurobiLinearTerm> ();
-
-  private double                                      constant;
-
-  protected GurobiExpression (final GurobiObjective objective) {
-    if (objective == null) {
-      throw new IllegalArgumentException ("Parameter objective is mandatory and may not be null");
-    }
-
-    this.objective = objective;
-    this.constraint = null;
-  }
-
-  protected GurobiExpression (final GurobiConstraint constraint) {
-    if (constraint == null) {
-      throw new IllegalArgumentException ("Parameter constraint is mandatory and may not be null");
-    }
-
+  protected GurobiLinearExpression (final GurobiProgram program) {
     this.objective = null;
     this.constraint = constraint;
   }
@@ -172,39 +150,19 @@ public class GurobiExpression implements Expression {
   }
 
   protected GRBLinExpr getNativeExpression () {
-    final GRBLinExpr expr = new GRBLinExpr ();
-
-    GRBVar[] vars = new GRBVar[linearTerms.size ()];
-    final double[] coeffs = new double[linearTerms.size ()];
-
-    int index = 0;
-    for (final Entry<GurobiVariable, GurobiLinearTerm> entry: linearTerms.entrySet ()) {
-      vars[index] = entry.getKey ().getNativeVariable ();
-      coeffs[index] = entry.getValue ().getCoefficient ();
-      index++;
-    }
-
-    expr.addConstant (constant);
-
-    try {
-      expr.addTerms (coeffs, vars);
-    } catch (GRBException e) {
-      throw new IllegalStateException ("Unable to create native linear expression", e);
-    }
-
-    return expr;
+    return expression;
   }
 
   @Override
   public int compareTo (final Expression expr) {
-    if (!(expr instanceof GurobiExpression)) {
+    if (!(expr instanceof GurobiLinearExpression)) {
       return -1;
     }
     if (equals (expr)) {
       return 0;
     }
 
-    final GurobiExpression grbExpr = ((GurobiExpression) expr);
+    final GurobiLinearExpression grbExpr = ((GurobiLinearExpression) expr);
     final int exprLength1 = linearTerms.size () + (Precision.equals (constant, ZERO_COEFFICIENT) ? 0 : 1);
     final int exprLength2 = grbExpr.linearTerms.size () +
                             (Precision.equals (grbExpr.constant, ZERO_COEFFICIENT) ? 0 : 1);
@@ -236,10 +194,10 @@ public class GurobiExpression implements Expression {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof GurobiExpression)) {
+    if (!(obj instanceof GurobiLinearExpression)) {
       return false;
     }
-    final GurobiExpression other = (GurobiExpression) obj;
+    final GurobiLinearExpression other = (GurobiLinearExpression) obj;
     if (Double.doubleToLongBits (constant) != Double.doubleToLongBits (other.constant)) {
       return false;
     }

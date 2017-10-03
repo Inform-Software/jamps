@@ -13,18 +13,12 @@
 
 package com.inform.jamps.solver.gurobi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.inform.jamps.modeling.Variable;
 import com.inform.jamps.modeling.VariableType;
 
-import gurobi.GRBVar;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -32,7 +26,7 @@ public class GurobiVariableTest {
 
   @Test
   public void testObjectCreationAndGetters () {
-    final GurobiProgram program = new GurobiProgram ();
+    final GurobiProgram program = createProgram ();
     final VariableType type = VariableType.CONTINUOUS;
     final String name = "Variable";
 
@@ -41,9 +35,7 @@ public class GurobiVariableTest {
     final GurobiVariable var3 = new GurobiVariable (program, name, type);
     final GurobiVariable var4 = new GurobiVariable (program, name, VariableType.BINARY);
 
-    assertEquals ("Expected different program for var1", program, var1.getProgram ());
-    assertEquals ("Expected different program for var2", program, var2.getProgram ());
-    assertEquals ("Expected different program for var3", program, var3.getProgram ());
+    program.updateChanges ();
 
     assertEquals ("Expected different operator for var1", GurobiVariable.DEFAULT_VARIABLE_TYPE, var1.getType ());
     assertEquals ("Expected different operator for var2", type, var2.getType ());
@@ -66,7 +58,7 @@ public class GurobiVariableTest {
 
   @Test
   public void testObjectCreationWithErrors () {
-    final GurobiProgram program = new GurobiProgram ();
+    final GurobiProgram program = createProgram ();
     final VariableType type = VariableType.CONTINUOUS;
     final String name = "Variable";
 
@@ -90,25 +82,11 @@ public class GurobiVariableTest {
   }
 
   @Test
-  public void testSettingNativeVar () {
-    final GRBVar grbVar = mock (GRBVar.class);
-
-    final GurobiVariable var = new GurobiVariable (new GurobiProgram ());
-    var.setNativeVariable (grbVar);
-
-    assertEquals ("Expected different native variable", grbVar, var.getNativeVariable ());
-
-    try {
-      var.setNativeVariable (null);
-      fail ("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException e) {
-    }
-  }
-
-  @Test
   public void testSettingInitialValue () {
     final double initialValue = 10.0;
-    final GurobiVariable var = new GurobiVariable (new GurobiProgram ());
+    final GurobiProgram program = createProgram ();
+    final GurobiVariable var = new GurobiVariable (program);
+    program.updateChanges ();
 
     assertFalse ("Expecting no initial value", var.hasInitialValue ());
 
@@ -119,6 +97,7 @@ public class GurobiVariableTest {
     }
 
     var.setInitialValue (initialValue);
+    program.updateChanges ();
 
     assertTrue ("Expecting initial value", var.hasInitialValue ());
     assertEquals ("Expected initial value to be 10.0", initialValue, var.getInitialValue (), 0.0001);
@@ -126,40 +105,11 @@ public class GurobiVariableTest {
 
   @Test
   public void testEqualsAndHashCode () {
-    EqualsVerifier.forClass (GurobiVariable.class)
-                  .allFieldsShouldBeUsedExcept ("program", "initialValue", "nativeVar")
-                  .suppress (Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS)
-                  .verify ();
+    EqualsVerifier.forClass (GurobiVariable.class).suppress (Warning.NULL_FIELDS).verify ();
   }
 
-  @Test
-  public void testCompareTo () {
-    final GurobiProgram program = new GurobiProgram ();
-    final String name = "Variable";
-
-    final GurobiVariable var1 = new GurobiVariable (program, name, VariableType.BINARY);
-    final GurobiVariable var2 = new GurobiVariable (program, name, VariableType.CONTINUOUS);
-    assertTrue ("Expected var2 to be less than var2", var1.compareTo (var2) > 0);
-    assertTrue ("Expected var2 to be less than var2", var2.compareTo (var1) < 0);
-
-    final GurobiVariable var3 = new GurobiVariable (program, name, VariableType.CONTINUOUS);
-    final GurobiVariable var4 = new GurobiVariable (program, name, VariableType.CONTINUOUS);
-    var3.setLowerBound (0.0);
-    assertTrue ("Expected var4 to be less than var3", var3.compareTo (var4) > 0);
-    assertTrue ("Expected var4 to be less than var3", var4.compareTo (var3) < 0);
-
-    final GurobiVariable var5 = new GurobiVariable (program, name, VariableType.CONTINUOUS);
-    final GurobiVariable var6 = new GurobiVariable (program, name, VariableType.CONTINUOUS);
-    var5.setUpperBound (0.0);
-    assertTrue ("Expected var5 to be less than var6", var5.compareTo (var6) < 0);
-    assertTrue ("Expected var5 to be less than var6", var6.compareTo (var5) > 0);
-
-    final GurobiVariable var7 = new GurobiVariable (program, "Name1", VariableType.CONTINUOUS);
-    final GurobiVariable var8 = new GurobiVariable (program, "Name2", VariableType.CONTINUOUS);
-    assertTrue ("Expected var7 to be less than var8", var7.compareTo (var8) < 0);
-    assertTrue ("Expected var7 to be less than var8", var8.compareTo (var7) > 0);
-
-    assertTrue ("Expected var7 to be less than any object of other class", var7.compareTo (mock (Variable.class)) < 0);
-    assertTrue ("Expected var7 to be less than null", var7.compareTo (null) < 0);
+  private GurobiProgram createProgram () {
+    return new GurobiProgram (new GurobiSolverParameters ());
   }
+
 }

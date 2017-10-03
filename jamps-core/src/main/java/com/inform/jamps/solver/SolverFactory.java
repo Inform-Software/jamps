@@ -17,5 +17,7 @@ public interface SolverFactory<T extends Solver<?>, P extends SolverParameters> 
 
   T createSolver ();
 
-  P createParameters ();
+  P getParameters ();
+
+  void setParameters (P parameters);
 }

@@ -27,9 +27,9 @@ public class GurobiConstraint implements Constraint {
 
   private final static AtomicLong AUTO_NAME_COUNTER = new AtomicLong (0);
 
-  private final GurobiExpression  lhs;
+  private final GurobiLinearExpression  lhs;
 
-  private final GurobiExpression  rhs;
+  private final GurobiLinearExpression  rhs;
 
   private final GurobiProgram     program;
 
@@ -64,8 +64,8 @@ public class GurobiConstraint implements Constraint {
     this.name = name;
     this.program = program;
     this.operator = operator;
-    this.lhs = new GurobiExpression (this);
-    this.rhs = new GurobiExpression (this);
+    this.lhs = new GurobiLinearExpression (this);
+    this.rhs = new GurobiLinearExpression (this);
   }
 
   @Override

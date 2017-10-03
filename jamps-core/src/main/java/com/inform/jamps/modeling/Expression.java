@@ -13,36 +13,6 @@
 
 package com.inform.jamps.modeling;
 
-import java.util.List;
+public interface Expression {
 
-public interface Expression extends Comparable<Expression> {
-
-  List<LinearTerm> getLinearTerms ();
-
-  List<QuadraticTerm> getQuadraticTerms ();
-
-  double getConstant ();
-
-  double getCoefficient (Variable variable);
-
-  double getCoefficient (Variable var1,
-                         Variable var2);
-
-  Expression addTerm (double coefficient,
-                      Variable variable);
-
-  Expression addTerm (double coefficient,
-                      Variable var1,
-                      Variable var2);
-
-  Expression addTerm (double constant);
-
-  Expression addTerms (Expression expr);
-
-  Expression removeLinearTerm (Variable variable);
-
-  Expression removeQuadraticTerm (Variable var1,
-                                  Variable var2);
-
-  Expression removeConstant ();
 }

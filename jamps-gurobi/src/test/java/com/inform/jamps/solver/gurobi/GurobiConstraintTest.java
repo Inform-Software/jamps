@@ -114,15 +114,15 @@ public class GurobiConstraintTest {
 
   @Test
   public void testEqualsAndHashCode () {
-    final GurobiExpression linExp1 = new GurobiExpression (new GurobiConstraint (new GurobiProgram ()));
-    final GurobiExpression linExp2 = new GurobiExpression (new GurobiConstraint (new GurobiProgram ()));
+    final GurobiLinearExpression linExp1 = new GurobiLinearExpression (new GurobiConstraint (new GurobiProgram ()));
+    final GurobiLinearExpression linExp2 = new GurobiLinearExpression (new GurobiConstraint (new GurobiProgram ()));
 
     linExp1.addTerm (9.0);
     linExp2.addTerm (10.0);
 
     EqualsVerifier.forClass (GurobiConstraint.class)
                   .allFieldsShouldBeUsedExcept ("program", "nativeConstraint")
-                  .withPrefabValues (GurobiExpression.class, linExp1, linExp2)
+                  .withPrefabValues (GurobiLinearExpression.class, linExp1, linExp2)
                   .suppress (Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS)
                   .verify ();
   }

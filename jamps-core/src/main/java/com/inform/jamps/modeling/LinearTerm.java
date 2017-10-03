@@ -13,7 +13,7 @@
 
 package com.inform.jamps.modeling;
 
-public interface LinearTerm extends Comparable<LinearTerm> {
+public interface LinearTerm {
 
   double getCoefficient ();
 

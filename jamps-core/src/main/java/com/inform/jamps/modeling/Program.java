@@ -13,7 +13,7 @@
 
 package com.inform.jamps.modeling;
 
-public interface Program extends Comparable<Program> {
+public interface Program {
 
   String getName ();
 
@@ -54,5 +54,7 @@ public interface Program extends Comparable<Program> {
   Constraint addConstraint (Operator operator);
 
   Constraint addConstraint ();
+
+  void updateChanges ();
 
 }

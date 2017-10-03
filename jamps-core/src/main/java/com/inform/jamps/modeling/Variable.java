@@ -13,7 +13,9 @@
 
 package com.inform.jamps.modeling;
 
-public interface Variable extends Comparable<Variable> {
+public interface Variable {
+
+  VariableType DEFAULT_VARIABLE_TYPE = VariableType.CONTINUOUS;
 
   String getName ();
 

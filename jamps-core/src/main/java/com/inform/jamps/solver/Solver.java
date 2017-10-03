@@ -15,6 +15,5 @@ package com.inform.jamps.solver;
 
 public interface Solver<T> {
 
-  ExecutionResult<T> solve (SolverParameters parameters,
-                            T problem);
+  ExecutionResult<T> solve (T problem);
 }

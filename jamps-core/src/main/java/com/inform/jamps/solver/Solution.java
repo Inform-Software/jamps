@@ -16,7 +16,7 @@ package com.inform.jamps.solver;
 import com.inform.jamps.modeling.Objective;
 import com.inform.jamps.modeling.Variable;
 
-public interface Solution extends Comparable<Solution> {
+public interface Solution {
 
   boolean isOptimal ();
 

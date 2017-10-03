@@ -13,7 +13,7 @@
 
 package com.inform.jamps.exception;
 
-public class DuplicateEntryException extends RuntimeException {
+public class DuplicateEntryException extends ProgramException {
 
   private static final long serialVersionUID = -5423862211099457962L;
 

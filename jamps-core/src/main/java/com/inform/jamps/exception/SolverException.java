@@ -13,9 +13,9 @@
 
 package com.inform.jamps.exception;
 
-public class SolverException extends RuntimeException {
+public class SolverException extends JampsException {
 
-  private static final long serialVersionUID = 7985915322824688907L;
+  private static final long serialVersionUID = -4720469099198002218L;
 
   public SolverException (final String message,
                           final Throwable cause) {

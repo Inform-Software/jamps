@@ -11,17 +11,19 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.inform.jamps.modeling;
+package com.inform.jamps.exception;
 
-public interface Constraint {
+public class ProgramException extends JampsException {
 
-  String getName ();
+  private static final long serialVersionUID = 7985915322824688907L;
 
-  Expression getRhs ();
+  public ProgramException (final String message,
+                           final Throwable cause) {
+    super (message, cause);
+  }
 
-  Expression getLhs ();
+  public ProgramException (final String message) {
+    super (message);
+  }
 
-  Operator getOperator ();
-
-  void setOperator (Operator operator);
 }

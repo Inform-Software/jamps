@@ -13,13 +13,7 @@
 
 package com.inform.jamps.modeling;
 
-public interface Objective extends Comparable<Objective> {
-
-  String getName ();
-
-  ObjectiveSense getObjectiveSense ();
-
-  void setObjectiveSense (ObjectiveSense sense);
+public interface Objective extends Obj {
 
   Expression getExpression ();
 

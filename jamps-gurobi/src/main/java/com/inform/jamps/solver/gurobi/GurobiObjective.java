@@ -25,7 +25,7 @@ public class GurobiObjective implements Objective {
 
   private final static AtomicLong       AUTO_NAME_COUNTER = new AtomicLong (0);
 
-  private final GurobiExpression        expression;
+  private final GurobiLinearExpression        expression;
 
   private final GurobiProgram           program;
 
@@ -58,7 +58,7 @@ public class GurobiObjective implements Objective {
     this.name = name;
     this.program = program;
     this.sense = sense;
-    this.expression = new GurobiExpression (this);
+    this.expression = new GurobiLinearExpression (this);
   }
 
   @Override

@@ -22,32 +22,34 @@ import gurobi.GRBException;
 
 public class GurobiSolverParameters implements SolverParameters {
 
-  private File    outputDirectory;
+  private final GRBEnv nativeEnvironment;
 
-  private boolean writeLPFile;
+  private File         outputDirectory;
 
-  private boolean writeMPSFile;
+  private boolean      writeLPFile;
 
-  private boolean useNamesForModelFileOutput = true;
+  private boolean      writeMPSFile;
 
-  private boolean writeIISFile;
+  private boolean      useNamesForModelFileOutput = true;
 
-  private boolean writeSolutionFile;
+  private boolean      writeIISFile;
 
-  private boolean writeParameterFile;
+  private boolean      writeSolutionFile;
 
-  private boolean useCompressionForFileOuput;
+  private boolean      writeParameterFile;
+
+  private boolean      useCompressionForFileOuput;
 
   protected GurobiSolverParameters () {
-    super ();
-  }
-
-  protected GRBEnv getNativeEnvironment () {
     try {
-      return new GRBEnv ();
+      this.nativeEnvironment = new GRBEnv ();
     } catch (GRBException e) {
       throw new IllegalStateException ("Unable to create native environment", e);
     }
+  }
+
+  protected GRBEnv getNativeEnvironment () {
+    return nativeEnvironment;
   }
 
   public File getOutputDirectory () {

@@ -16,11 +16,13 @@ package com.inform.jamps.solver.gurobi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inform.jamps.exception.DuplicateEntryException;
+import com.inform.jamps.exception.ProgramException;
 import com.inform.jamps.modeling.Constraint;
 import com.inform.jamps.modeling.Objective;
 import com.inform.jamps.modeling.ObjectiveSense;
@@ -33,7 +35,6 @@ import gurobi.GRB;
 import gurobi.GRB.DoubleAttr;
 import gurobi.GRB.StringAttr;
 import gurobi.GRBConstr;
-import gurobi.GRBEnv;
 import gurobi.GRBException;
 import gurobi.GRBLinExpr;
 import gurobi.GRBModel;
@@ -41,35 +42,44 @@ import gurobi.GRBVar;
 
 public class GurobiProgram implements Program {
 
-  private final static AtomicLong            AUTO_NAME_COUNTER = new AtomicLong (0);
+  private static final Logger          LOG               = LoggerFactory.getLogger (GurobiProgram.class);
 
-  private final NavigableSet<GurobiVariable> variables         = new TreeSet<GurobiVariable> ();
+  private final static AtomicLong      AUTO_NAME_COUNTER = new AtomicLong (0);
 
-  private final List<GurobiObjective>        objectives        = new ArrayList<GurobiObjective> ();
+  private final List<GurobiVariable>   variables         = new ArrayList<GurobiVariable> ();
 
-  private final List<GurobiConstraint>       constraints       = new ArrayList<GurobiConstraint> ();
+  private final List<GurobiObjective>  objectives        = new ArrayList<GurobiObjective> ();
 
-  private String                             name;
+  private final List<GurobiConstraint> constraints       = new ArrayList<GurobiConstraint> ();
 
-  private GRBEnv                             nativeEnvironment;
+  private final GurobiSolverParameters parameters;
 
-  private GRBModel                           nativeModel;
+  private final GRBModel               nativeModel;
 
-  protected GurobiProgram () {
-    this ("program" + AUTO_NAME_COUNTER.incrementAndGet ());
+  protected GurobiProgram (final GurobiSolverParameters parameters) {
+    this (parameters, "program" + AUTO_NAME_COUNTER.incrementAndGet ());
   }
 
-  protected GurobiProgram (final String name) {
-    if (name == null) {
-      throw new IllegalArgumentException ("Parameter name is mandatory and may not be null");
+  protected GurobiProgram (final GurobiSolverParameters parameters,
+                           final String name) {
+    this.parameters = parameters;
+    try {
+      this.nativeModel = new GRBModel (parameters.getNativeEnvironment ());
+    } catch (GRBException e) {
+      LOG.error ("Unable to create native gurobi model", e);
+      throw new ProgramException ("Unable to create native gurobi model", e);
     }
-
-    this.name = name;
+    setName (name);
   }
 
   @Override
   public String getName () {
-    return name;
+    try {
+      return nativeModel.get (StringAttr.ModelName);
+    } catch (GRBException e) {
+      LOG.error ("Unable to get name from native gurobi model", e);
+      throw new ProgramException ("Unable to get name from native gurobi model", e);
+    }
   }
 
   @Override
@@ -78,7 +88,12 @@ public class GurobiProgram implements Program {
       throw new IllegalArgumentException ("Parameter name is mandatory and may not be null");
     }
 
-    this.name = name;
+    try {
+      nativeModel.set (StringAttr.ModelName, name);
+    } catch (GRBException e) {
+      LOG.error ("Unable to set name to native gurobi model", e);
+      throw new ProgramException ("Unable to set name to native gurobi model", e);
+    }
   }
 
   @Override
@@ -195,24 +210,7 @@ public class GurobiProgram implements Program {
     return Collections.unmodifiableList (constraints);
   }
 
-  protected void setNativeEnvironment (final GRBEnv env) {
-    if (env == null) {
-      throw new IllegalArgumentException ("GRBEnv parameter is mandatory and may not be null");
-    }
-
-    this.nativeEnvironment = env;
-  }
-
-  protected GRBEnv getNativeEnvironment () {
-    return nativeEnvironment;
-  }
-
   protected GRBModel getNativeModel () {
-    if (nativeModel == null) {
-      nativeModel = initialCreateNativeModel ();
-    }
-
-    updateNativeModel ();
     return nativeModel;
   }
 
@@ -329,8 +327,8 @@ public class GurobiProgram implements Program {
     try {
       int count = 0;
       for (final GurobiConstraint constraint: constraints) {
-        final GRBLinExpr nativeLhsExpr = ((GurobiExpression) constraint.getLhs ()).getNativeExpression ();
-        final GRBLinExpr nativeRhsExpr = ((GurobiExpression) constraint.getRhs ()).getNativeExpression ();
+        final GRBLinExpr nativeLhsExpr = ((GurobiLinearExpression) constraint.getLhs ()).getNativeExpression ();
+        final GRBLinExpr nativeRhsExpr = ((GurobiLinearExpression) constraint.getRhs ()).getNativeExpression ();
         nativeLhsExpr.multAdd (-1, nativeRhsExpr);
 
         expressions[count] = nativeLhsExpr;
@@ -369,28 +367,19 @@ public class GurobiProgram implements Program {
     }
   }
 
-  protected void updateNativeModel () {
-    // TODO: Implement me!
-  }
-
   @Override
-  public int compareTo (final Program program) {
-    if (program == null) {
-      return -1;
+  public void updateChanges () {
+    try {
+      nativeModel.update ();
+    } catch (GRBException e) {
+      LOG.error ("Unable to update native gurobi model", e);
+      throw new ProgramException ("Unable to update native gurobi model", e);
     }
-
-    return name.compareTo (program.getName ());
   }
 
   @Override
   public final int hashCode () {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + name.hashCode ();
-    result = prime * result + constraints.hashCode ();
-    result = prime * result + objectives.hashCode ();
-    result = prime * result + variables.hashCode ();
-    return result;
+    return nativeModel.hashCode ();
   }
 
   @Override
@@ -405,20 +394,12 @@ public class GurobiProgram implements Program {
       return false;
     }
     final GurobiProgram other = (GurobiProgram) obj;
-    if (!name.equals (other.name)) {
-      return false;
-    }
-    if (!constraints.equals (other.constraints)) {
-      return false;
-    }
-    if (!objectives.equals (other.objectives)) {
-      return false;
-    }
-    return variables.equals (other.variables);
+    return nativeModel.equals (other.nativeModel);
   }
 
   @Override
   public String toString () {
-    return name;
+    return getName ();
   }
+
 }

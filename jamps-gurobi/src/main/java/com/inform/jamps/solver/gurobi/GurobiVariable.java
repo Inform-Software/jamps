@@ -16,31 +16,27 @@ package com.inform.jamps.solver.gurobi;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.math3.util.Precision;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.inform.jamps.exception.ProgramException;
 import com.inform.jamps.modeling.Variable;
 import com.inform.jamps.modeling.VariableType;
 
+import gurobi.GRB;
+import gurobi.GRB.CharAttr;
+import gurobi.GRB.DoubleAttr;
+import gurobi.GRB.StringAttr;
+import gurobi.GRBException;
 import gurobi.GRBVar;
 
 public class GurobiVariable implements Variable {
 
-  protected final static VariableType DEFAULT_VARIABLE_TYPE = VariableType.CONTINUOUS;
+  private static final Logger     LOG               = LoggerFactory.getLogger (GurobiVariable.class);
 
-  private final static AtomicLong     AUTO_NAME_COUNTER     = new AtomicLong (0);
+  private final static AtomicLong AUTO_NAME_COUNTER = new AtomicLong (0);
 
-  private final GurobiProgram         program;
-
-  private final String                name;
-
-  private final VariableType          type;
-
-  private double                      lowerBound;
-
-  private double                      upperBound;
-
-  private Double                      initialValue;
-
-  private transient GRBVar            nativeVar;
+  private final GRBVar            nativeVar;
 
   protected GurobiVariable (final GurobiProgram program) {
     this (program, DEFAULT_VARIABLE_TYPE);
@@ -64,77 +60,118 @@ public class GurobiVariable implements Variable {
       throw new IllegalArgumentException ("Parameter type is mandatory and may not be null");
     }
 
-    this.program = program;
-    this.name = name;
-    this.type = type;
+    final char nativeType = GurobiUtils.convertToNativeType (type);
 
-    if (type == VariableType.BINARY) {
-      lowerBound = 0.0;
-      upperBound = 1.0;
-    } else {
-      lowerBound = Double.NEGATIVE_INFINITY;
-      upperBound = Double.POSITIVE_INFINITY;
+    try {
+      if (type == VariableType.BINARY) {
+        this.nativeVar = program.getNativeModel ().addVar (0.0, 1.0, 0.0, nativeType, name);
+      } else {
+        this.nativeVar = program.getNativeModel ().addVar (Double.NEGATIVE_INFINITY,
+                                                           Double.POSITIVE_INFINITY,
+                                                           0.0,
+                                                           nativeType,
+                                                           name);
+      }
+    } catch (GRBException e) {
+      LOG.error ("Unable to create native gurobi variable", e);
+      throw new ProgramException ("Unable to create native gurobi variable", e);
     }
   }
 
   @Override
   public String getName () {
-    return name;
+    try {
+      return nativeVar.get (StringAttr.VarName);
+    } catch (GRBException e) {
+      LOG.error ("Unable to get name from native gurobi variable", e);
+      throw new ProgramException ("Unable to get name from native gurobi variable", e);
+    }
   }
 
   @Override
   public VariableType getType () {
-    return type;
+    try {
+      return GurobiUtils.convertFromNativeType (nativeVar.get (CharAttr.VType));
+    } catch (Exception e) {
+      LOG.error ("Unable to get type from native gurobi variable", e);
+      throw new ProgramException ("Unable to get type from native gurobi variable", e);
+    }
   }
 
   @Override
   public double getLowerBound () {
-    return lowerBound;
+    try {
+      return GurobiUtils.convertInfinity (nativeVar.get (DoubleAttr.LB));
+    } catch (GRBException e) {
+      LOG.error ("Unable to get lower bound from native gurobi variable", e);
+      throw new ProgramException ("Unable to get lower bound from native gurobi variable", e);
+    }
   }
 
   @Override
   public void setLowerBound (final double lowerBound) {
-    this.lowerBound = lowerBound;
+    try {
+      nativeVar.set (DoubleAttr.LB, lowerBound);
+    } catch (GRBException e) {
+      LOG.error ("Unable to set lower bound to native gurobi variable", e);
+      throw new ProgramException ("Unable to set lower bound to native gurobi variable", e);
+    }
   }
 
   @Override
   public double getUpperBound () {
-    return upperBound;
+    try {
+      return GurobiUtils.convertInfinity (nativeVar.get (DoubleAttr.UB));
+    } catch (GRBException e) {
+      LOG.error ("Unable to get upper bound from native gurobi variable", e);
+      throw new ProgramException ("Unable to get upper bound from native gurobi variable", e);
+    }
   }
 
   @Override
   public void setUpperBound (final double upperBound) {
-    this.upperBound = upperBound;
+    try {
+      nativeVar.set (DoubleAttr.UB, upperBound);
+    } catch (GRBException e) {
+      LOG.error ("Unable to set upper bound to native gurobi variable", e);
+      throw new ProgramException ("Unable to set upper bound to native gurobi variable", e);
+    }
   }
 
   @Override
   public boolean hasInitialValue () {
-    return initialValue != null;
+    try {
+      final double startValue = nativeVar.get (DoubleAttr.Start);
+      return !Precision.equals (startValue, GRB.UNDEFINED);
+    } catch (GRBException e) {
+      LOG.error ("Unable to get initial value from native gurobi variable", e);
+      throw new ProgramException ("Unable to get initial value from native gurobi variable", e);
+    }
   }
 
   @Override
   public double getInitialValue () {
-    if (!hasInitialValue ()) {
-      throw new IllegalStateException ("Variable has no initial value set");
+    try {
+      final double startValue = nativeVar.get (DoubleAttr.Start);
+      if (Precision.equals (startValue, GRB.UNDEFINED)) {
+        throw new IllegalStateException ("Variable has no initial value set");
+      } else {
+        return GurobiUtils.convertInfinity (startValue);
+      }
+    } catch (GRBException e) {
+      LOG.error ("Unable to get initial value from native gurobi variable", e);
+      throw new ProgramException ("Unable to get initial value from native gurobi variable", e);
     }
-    return initialValue;
   }
 
   @Override
   public void setInitialValue (final double initialValue) {
-    this.initialValue = initialValue;
-  }
-
-  protected GurobiProgram getProgram () {
-    return program;
-  }
-
-  protected void setNativeVariable (final GRBVar grbVar) {
-    if (grbVar == null) {
-      throw new IllegalArgumentException ("GRBVar parameter is mandatory and may not be null");
+    try {
+      nativeVar.set (DoubleAttr.Start, initialValue);
+    } catch (GRBException e) {
+      LOG.error ("Unable to set initial value to native gurobi variable", e);
+      throw new ProgramException ("Unable to set initial value to native gurobi variable", e);
     }
-
-    this.nativeVar = grbVar;
   }
 
   protected GRBVar getNativeVariable () {
@@ -142,41 +179,8 @@ public class GurobiVariable implements Variable {
   }
 
   @Override
-  public int compareTo (final Variable var) {
-    if (!(var instanceof GurobiVariable)) {
-      return -1;
-    }
-
-    int result = name.compareTo (var.getName ());
-    if (result != 0) {
-      return result;
-    }
-
-    result = type.compareTo (var.getType ());
-    if (result != 0) {
-      return result;
-    }
-
-    result = Double.compare (lowerBound, var.getLowerBound ());
-    if (result != 0) {
-      return result;
-    }
-
-    return Double.compare (upperBound, var.getUpperBound ());
-  }
-
-  @Override
   public final int hashCode () {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + name.hashCode ();
-    result = prime * result + type.hashCode ();
-    long temp;
-    temp = Double.doubleToLongBits (lowerBound);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits (upperBound);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    return result;
+    return nativeVar.hashCode ();
   }
 
   @Override
@@ -191,22 +195,13 @@ public class GurobiVariable implements Variable {
       return false;
     }
     final GurobiVariable other = (GurobiVariable) obj;
-    if (!name.equals (other.name)) {
-      return false;
-    }
-    if (type != other.type) {
-      return false;
-    }
-    if (Double.doubleToLongBits (lowerBound) != Double.doubleToLongBits (other.lowerBound)) {
-      return false;
-    }
-    return Double.doubleToLongBits (upperBound) == Double.doubleToLongBits (other.upperBound);
+    return nativeVar.sameAs (other.nativeVar);
   }
 
   @Override
   public String toString () {
     final StringBuilder sb = new StringBuilder (200);
-    switch (type) {
+    switch (getType ()) {
       case BINARY:
         sb.append ("Binary ");
         break;
@@ -225,7 +220,9 @@ public class GurobiVariable implements Variable {
       default:
         break;
     }
-    sb.append (name);
+    sb.append (getName ());
+    final double lowerBound = getLowerBound ();
+    final double upperBound = getUpperBound ();
     if (lowerBound > Double.NEGATIVE_INFINITY || upperBound < Double.POSITIVE_INFINITY) {
       if (Precision.equals (lowerBound, Double.NEGATIVE_INFINITY)) {
         sb.append (" (,");

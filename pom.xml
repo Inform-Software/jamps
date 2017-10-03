@@ -181,33 +181,33 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+      <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.6</version>
         <configuration>
-          <failOnViolation>true</failOnViolation>
-          <failurePriority>2</failurePriority>
-          <verbose>true</verbose>
-          <linkXRef>false</linkXRef>
-          <minimumTokens>150</minimumTokens>
-          <targetJdk>1.6</targetJdk>
-          <typeResolution>true</typeResolution>
-          <outputDirectory>${project.build.directory}/pmd/</outputDirectory>
-          <rulesets>
-            <ruleset>../pmd-ruleset.xml</ruleset>
-          </rulesets>
+        <failOnViolation>true</failOnViolation>
+        <failurePriority>2</failurePriority>
+        <verbose>true</verbose>
+        <linkXRef>false</linkXRef>
+        <minimumTokens>150</minimumTokens>
+        <targetJdk>1.6</targetJdk>
+        <typeResolution>true</typeResolution>
+        <outputDirectory>${project.build.directory}/pmd/</outputDirectory>
+        <rulesets>
+        <ruleset>../pmd-ruleset.xml</ruleset>
+        </rulesets>
         </configuration>
         <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-              <goal>cpd-check</goal>
-            </goals>
-          </execution>
+        <execution>
+        <phase>verify</phase>
+        <goals>
+        <goal>check</goal>
+        <goal>cpd-check</goal>
+        </goals>
+        </execution>
         </executions>
-      </plugin>
+        </plugin> -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
@@ -252,6 +252,11 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>

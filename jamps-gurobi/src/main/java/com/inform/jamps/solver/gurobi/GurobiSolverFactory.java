@@ -18,23 +18,34 @@ import com.inform.jamps.solver.MathProgrammingSolverFactory;
 
 public class GurobiSolverFactory implements MathProgrammingSolverFactory<GurobiSolver, GurobiSolverParameters> {
 
+  private GurobiSolverParameters parameters = new GurobiSolverParameters ();
+
   @Override
   public GurobiSolver createSolver () {
-    return new GurobiSolver ();
+    return new GurobiSolver (parameters);
   }
 
   @Override
-  public GurobiSolverParameters createParameters () {
-    return new GurobiSolverParameters ();
+  public GurobiSolverParameters getParameters () {
+    return parameters;
+  }
+
+  @Override
+  public void setParameters (final GurobiSolverParameters parameters) {
+    if (parameters == null) {
+      throw new IllegalArgumentException ("SolverParameters is mandatory and may not be null");
+    }
+    this.parameters = parameters;
   }
 
   @Override
   public Program createProgram () {
-    return new GurobiProgram ();
+    return new GurobiProgram (parameters);
   }
 
   @Override
   public Program createProgram (final String name) {
-    return new GurobiProgram (name);
+    return new GurobiProgram (parameters, name);
   }
+
 }

@@ -51,8 +51,8 @@ public class GurobiExpressionTest {
     final GurobiObjective objective = new GurobiObjective (program);
     final GurobiVariable variable = new GurobiVariable (program);
 
-    final GurobiExpression linExpr1 = new GurobiExpression (constraint);
-    final GurobiExpression linExpr2 = new GurobiExpression (objective);
+    final GurobiLinearExpression linExpr1 = new GurobiLinearExpression (constraint);
+    final GurobiLinearExpression linExpr2 = new GurobiLinearExpression (objective);
 
     assertEquals ("Expected linear expression to contain no variables", 0, linExpr1.getLinearTerms ().size ());
     assertEquals ("Expected linear expression to contain no variables", 0, linExpr2.getLinearTerms ().size ());
@@ -74,13 +74,13 @@ public class GurobiExpressionTest {
   @Test
   public void testObjectCreationWithErrors () {
     try {
-      new GurobiExpression ((GurobiConstraint) null);
+      new GurobiLinearExpression ((GurobiConstraint) null);
       fail ("Expected IllegalArgumentException");
     } catch (IllegalArgumentException e) {
     }
 
     try {
-      new GurobiExpression ((GurobiObjective) null);
+      new GurobiLinearExpression ((GurobiObjective) null);
       fail ("Expected IllegalArgumentException");
     } catch (IllegalArgumentException e) {
     }
@@ -94,8 +94,8 @@ public class GurobiExpressionTest {
     final GurobiObjective obj = new GurobiObjective (program, ObjectiveSense.MAXIMIZE);
     final GurobiConstraint constr = new GurobiConstraint (program, Operator.GREATER_EQUALS);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
-    final GurobiExpression expr2 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr2 = new GurobiLinearExpression (obj);
 
     expr1.addTerm (CONSTANT_TERM);
     expr2.addTerm (CONSTANT_TERM);
@@ -127,8 +127,8 @@ public class GurobiExpressionTest {
     final GurobiVariable var2 = new GurobiVariable (program, VariableType.BINARY);
     final GurobiVariable var3 = new GurobiVariable (program, VariableType.BINARY);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
-    final GurobiExpression expr2 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr2 = new GurobiLinearExpression (obj);
 
     expr1.addTerm (COEFFICIENT, var1);
     expr2.addTerm (COEFFICIENT, var1);
@@ -163,7 +163,7 @@ public class GurobiExpressionTest {
     final GurobiVariable var4 = mock (GurobiVariable.class);
     when (var4.getProgram ()).thenReturn (null);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
     expr1.addTerm (COEFFICIENT, var1);
 
     try {
@@ -193,8 +193,8 @@ public class GurobiExpressionTest {
     final GurobiObjective obj = new GurobiObjective (program, ObjectiveSense.MAXIMIZE);
     final GurobiConstraint constr = new GurobiConstraint (program, Operator.GREATER_EQUALS);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
-    final GurobiExpression expr2 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr2 = new GurobiLinearExpression (obj);
 
     expr1.addTerm (CONSTANT_TERM);
     expr2.addTerm (CONSTANT_TERM);
@@ -220,8 +220,8 @@ public class GurobiExpressionTest {
     final GurobiVariable var2 = new GurobiVariable (program, VariableType.BINARY);
     final GurobiVariable var3 = new GurobiVariable (program, VariableType.BINARY);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
-    final GurobiExpression expr2 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr2 = new GurobiLinearExpression (obj);
 
     expr1.addTerm (COEFFICIENT, var1).addTerm (COEFFICIENT, var2);
     expr2.addTerm (COEFFICIENT, var1).addTerm (COEFFICIENT, var2);
@@ -262,7 +262,7 @@ public class GurobiExpressionTest {
     final GurobiConstraint constr = new GurobiConstraint (program, Operator.GREATER_EQUALS);
     final GurobiVariable var1 = new GurobiVariable (program, VariableType.BINARY);
     final GurobiVariable var2 = new GurobiVariable (program, VariableType.BINARY);
-    final GurobiExpression expr = new GurobiExpression (constr);
+    final GurobiLinearExpression expr = new GurobiLinearExpression (constr);
 
     expr.addTerm (COEFFICIENT, var1).addTerm (COEFFICIENT, var2);
     final GRBLinExpr nativeExpression = expr.getNativeExpression ();
@@ -271,13 +271,13 @@ public class GurobiExpressionTest {
   }
 
   @Test
-  @PrepareOnlyThisForTest (GurobiExpression.class)
+  @PrepareOnlyThisForTest (GurobiLinearExpression.class)
   public void testCreationOfNativeExpressionWithError () throws Exception {
     final double COEFFICIENT = 10.0;
     final GurobiProgram program = new GurobiProgram ();
     final GurobiConstraint constr = new GurobiConstraint (program, Operator.GREATER_EQUALS);
     final GurobiVariable var = new GurobiVariable (program, VariableType.BINARY);
-    final GurobiExpression expr = new GurobiExpression (constr);
+    final GurobiLinearExpression expr = new GurobiLinearExpression (constr);
     expr.addTerm (COEFFICIENT, var);
 
     final GRBLinExpr nativeExprMock = mock (GRBLinExpr.class);
@@ -299,7 +299,7 @@ public class GurobiExpressionTest {
     final GurobiVariable var1 = new GurobiVariable (program, VariableType.BINARY);
     final GurobiVariable var2 = new GurobiVariable (program, VariableType.BINARY);
 
-    final GurobiExpression expr = new GurobiExpression (constr);
+    final GurobiLinearExpression expr = new GurobiLinearExpression (constr);
     expr.addTerm (COEFFICIENT, var1);
 
     try {
@@ -326,7 +326,7 @@ public class GurobiExpressionTest {
     final GurobiConstraint constr1 = new GurobiConstraint (program, Operator.GREATER_EQUALS);
     final GurobiConstraint constr2 = new GurobiConstraint (program, Operator.LESS_EQUALS);
 
-    EqualsVerifier.forClass (GurobiExpression.class)
+    EqualsVerifier.forClass (GurobiLinearExpression.class)
                   .allFieldsShouldBeUsedExcept ("objective", "constraint")
                   .suppress (Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS)
                   .withPrefabValues (GurobiObjective.class, obj1, obj2)
@@ -341,25 +341,25 @@ public class GurobiExpressionTest {
     final GurobiConstraint constr = new GurobiConstraint (program, Operator.GREATER_EQUALS);
     final GurobiVariable variable = new GurobiVariable (program, VariableType.BINARY);
 
-    final GurobiExpression expr1 = new GurobiExpression (constr);
-    final GurobiExpression expr2 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr1 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr2 = new GurobiLinearExpression (obj);
     assertEquals ("Expected expressions to be equal", 0, expr1.compareTo (expr2));
     assertEquals ("Expected expressions to be equal", 0, expr2.compareTo (expr1));
 
-    final GurobiExpression expr3 = new GurobiExpression (constr);
-    final GurobiExpression expr4 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr3 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr4 = new GurobiLinearExpression (obj);
     expr3.addTerm (1.0);
     assertTrue ("Expected expr4 to be less than expr3", expr3.compareTo (expr4) > 0);
     assertTrue ("Expected expr4 to be less than expr3", expr4.compareTo (expr3) < 0);
 
-    final GurobiExpression expr5 = new GurobiExpression (constr);
-    final GurobiExpression expr6 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr5 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr6 = new GurobiLinearExpression (obj);
     expr5.addTerm (1.0, variable);
     assertTrue ("Expected expr6 to be less than expr3", expr5.compareTo (expr6) > 0);
     assertTrue ("Expected expr6 to be less than expr3", expr6.compareTo (expr5) < 0);
 
-    final GurobiExpression expr7 = new GurobiExpression (constr);
-    final GurobiExpression expr8 = new GurobiExpression (obj);
+    final GurobiLinearExpression expr7 = new GurobiLinearExpression (constr);
+    final GurobiLinearExpression expr8 = new GurobiLinearExpression (obj);
     expr7.addTerm (10.0);
     expr8.addTerm (5.0);
     assertTrue ("Expected expr8 to be less than expr7", expr7.compareTo (expr8) > 0);
@@ -370,7 +370,7 @@ public class GurobiExpressionTest {
     assertTrue ("Expected expr7 to be less than null", expr7.compareTo (null) < 0);
   }
 
-  private boolean containsTerm (GurobiExpression expr,
+  private boolean containsTerm (GurobiLinearExpression expr,
                                 double coeff,
                                 GurobiVariable var) {
     return expr.getLinearTerms ().contains (new GurobiLinearTerm (coeff, var));
